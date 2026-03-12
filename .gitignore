@@ -3,13 +3,24 @@
 # =========================
 .DS_Store
 Thumbs.db
+desktop.ini
 
 # =========================
-# Arduino Build Files
+# Arduino / ESP32 Build Files
 # =========================
 *.ino.hex
 *.elf
 *.bin
+*.map
+*.eep
+*.lst
+
+# =========================
+# Arduino Temporary Files
+# =========================
+*.arduino.json
+*.arduino-build
+*.arduino.cache
 
 # =========================
 # Wokwi
@@ -24,10 +35,25 @@ Thumbs.db
 # =========================
 # VS Code
 # =========================
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
+!.vscode/launch.json
 
 # =========================
 # Arquivos temporários
 # =========================
 *.tmp
 *.swp
+*.bak
+*~
+
+# =========================
+# Dependências locais
+# =========================
+node_modules/
+dist/
+build/
+
+# Arquivos ignorados para manter o repositório limpo
+# Projeto de sistemas embarcados com ESP32 e simulação Wokwi
