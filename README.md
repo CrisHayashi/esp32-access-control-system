@@ -1,66 +1,105 @@
-# Controle de Acesso com ESP32
+# 🔐 Sistema de Controle de Acesso com ESP32
+![ESP32](https://img.shields.io/badge/ESP32-Microcontroller-blue)
+![C++](https://img.shields.io/badge/Language-C++-green)
+![Arduino](https://img.shields.io/badge/Framework-Arduino-orange)
+![IoT](https://img.shields.io/badge/Architecture-IoT-purple)
+![Simulator](https://img.shields.io/badge/Simulation-Wokwi-yellow)
+![License](https://img.shields.io/badge/License-Academic-lightgrey)
 
 Projeto acadêmico desenvolvido no curso de **Análise e Desenvolvimento de Sistemas**, na disciplina de **Sistemas Embarcados**.
 
-O sistema implementa um **controle de acesso embarcado baseado em senha**, utilizando ESP32 e diversos periféricos para interação com o usuário.
+O sistema implementa um **controle de acesso embarcado baseado em senha**, utilizando ESP32 e diversos periféricos de interface para interação com o usuário.
 
 ---
 
-# Visão Geral do Sistema
+## 🎬 Demonstração do Sistema
 
-O sistema permite autenticação por senha através de um teclado matricial.  
-Dependendo da validação da senha, o sistema controla um servo motor simulando a abertura de uma porta.
-
-O usuário recebe feedback através de:
-
-- Display LCD
-- LED RGB
-- Buzzer
+![Demo](hardware/demo.gif)
 
 ---
 
-# Arquitetura do Sistema
+## 📑 Sumário
 
-Keypad
-↓
-ESP32 (Controle de acesso)
-↓
-├── LCD I2C (mensagens)
-├── RGB LED (status)
-├── Buzzer (alerta sonoro)
-└── Servo Motor (abertura)
-
-
----
-
-# Funcionamento do Sistema
-
-Fluxo do sistema:
-
-Usuário digita senha
-↓
-ESP32 valida senha
-↓
-Senha correta → acesso liberado
-Senha incorreta → tentativa registrada
-↓
-3 tentativas erradas → sistema bloqueado temporariamente
-
+- [📌 Visão Geral](#-visão-geral)
+- [🧠 Arquitetura do Sistema](#-arquitetura-do-sistema)
+- [⚙️ Funcionamento do Sistema](#️-funcionamento-do-sistema)
+- [🖥 Interface do Usuário](#-interface-do-usuário)
+- [🔧 Componentes Utilizados](#-componentes-utilizados)
+- [🎬 Simulação do Circuito](#-simulação-do-circuito)
+- [📂 Estrutura do Projeto](#-estrutura-do-projeto)
+- [🛠 Tecnologias Utilizadas](#-tecnologias-utilizadas)
+- [🚀 MVP1 — Sistema Embarcado Local](#-mvp1--sistema-embarcado-local)
+- [🌐 MVP2 — Integração IoT](#-mvp2--integração-iot-planejado)
+- [🧪 Simulação](#-simulação)
+- [👨‍💻 Autor](#-autor)
 
 ---
 
-# Interface do Usuário
+## 📌 Visão Geral
+
+O sistema permite que um usuário digite uma senha em um **teclado matricial 4x4**.  
+Após a validação da senha, o **ESP32** controla um **servo motor**, simulando a abertura de um mecanismo de acesso.
+
+O sistema fornece feedback ao usuário por meio de:
+
+- 📟 Display LCD 16x2 (I2C)
+- 💡 LED RGB para indicação de status
+- ⚙️ Servo motor para simulação da abertura do acesso
+
+---
+
+## 🧠 Arquitetura do Sistema
+
+```mermaid
+flowchart TD
+
+A[Usuário] --> B[Teclado 4x4]
+B --> C[ESP32]
+
+C --> D[LCD 16x2]
+C --> E[LED RGB]
+C --> F[Servo Motor]
+
+
+O ESP32 atua como unidade central de controle, responsável por:
+
+- leitura do teclado
+- validação da senha
+- controle dos dispositivos de saída
+- gerenciamento do estado do sistema
+
+---
+
+## ⚙️ Funcionamento do Sistema
+
+Fluxo de operação:
+
+```mermaid
+flowchart TD
+
+A[Usuário digita senha] --> B[ESP32 valida senha]
+
+B -->|Senha correta| C[Acesso liberado]
+B -->|Senha incorreta| D[Tentativa rejeitada]
+
+D --> E{3 tentativas consecutivas?}
+
+E -->|Sim| F[Sistema bloqueado temporariamente]
+E -->|Não| A
+
+---
+
+## 🖥 Interface do Usuário
 
 | Dispositivo | Função |
 |-------------|--------|
-LCD | exibe mensagens do sistema |
-RGB LED | indica estado do sistema |
-Buzzer | alerta sonoro |
-Servo | simula abertura da porta |
+| LCD 16x2 | Exibição de mensagens do sistema |
+| LED RGB | Indicação visual do estado do sistema |
+| Servo Motor | Simulação da abertura do acesso |
 
 ---
 
-# Componentes Utilizados
+## 🔧 Componentes Utilizados
 
 Hardware utilizado no projeto:
 
@@ -69,21 +108,25 @@ Hardware utilizado no projeto:
 - Display LCD 16x2 (I2C)
 - Servo Motor
 - LED RGB
-- Buzzer
 - Resistores
+- Jumpers
 
 ---
 
-# Simulação do Circuito
+## 🎬 Simulação do Circuito
 
-Imagem da simulação no Wokwi:
+Imagem e demonstração da simulação no **Wokwi**:
 
 ![Circuito](hardware/circuito.png)
 
+![Demonstração](hardware/demo.gif)
+
 ---
 
-# Estrutura do Projeto
+## 📂 Estrutura do Projeto
 
+````markdown
+```text
 Controle-Acesso-ESP32
 │
 ├── docs
@@ -106,10 +149,9 @@ Controle-Acesso-ESP32
 ├── README.md
 └── .gitignore
 
-
 ---
 
-# Tecnologias Utilizadas
+## 🛠 Tecnologias Utilizadas
 
 - ESP32
 - Linguagem C/C++ (Arduino Framework)
@@ -119,24 +161,23 @@ Controle-Acesso-ESP32
 
 ---
 
-# MVP1 – Sistema Embarcado Local
+## 🚀 MVP1 – Sistema Embarcado Local
 
 Primeira versão do projeto implementa o sistema funcionando localmente com:
 
 - autenticação por senha
 - controle de acesso com servo
-- interface LCD
+- interface com display LCD
 - feedback visual (RGB)
-- feedback sonoro (buzzer)
-- bloqueio após múltiplas tentativas
+- bloqueio após múltiplas tentativas inválidas
 
 Todo o processamento ocorre diretamente no microcontrolador.
 
 ---
 
-# MVP2 – Integração IoT
+## 🌐 MVP2 – Integração IoT (planejado)
 
-Na segunda etapa o sistema será expandido para:
+Na próxima etapa o sistema será expandido para:
 
 - conexão **WiFi**
 - envio de eventos para **TagoIO**
@@ -148,7 +189,7 @@ Fluxo planejado:
 ESP32 → WiFi → TagoIO → Dashboard
 
 
-Eventos monitorados:
+Eventos que poderão ser monitorados:
 
 - acesso liberado
 - acesso negado
@@ -156,7 +197,7 @@ Eventos monitorados:
 
 ---
 
-# Simulação
+## 🧪 Simulação
 
 O circuito pode ser executado utilizando o simulador **Wokwi**, através dos arquivos presentes na pasta:
 
@@ -166,10 +207,13 @@ simulation/wokwi
 
 ---
 
-# Autor
+## 👨‍💻 Autor
 
 Projeto desenvolvido por **iTech, inspirational Tech**  
-Prof: **Claudio Pereira**
-Curso: **Análise e Desenvolvimento de Sistemas**  
-Disciplina: **Sistemas Embarcados**  
-Universidade: **Faculdade Nova Roma**
+
+🎓 Curso: **Análise e Desenvolvimento de Sistemas**  
+🏫 Universidade: **Faculdade Nova Roma**  
+📚 Disciplina: **Sistemas Embarcados**  
+👨‍🏫 Professor: **Claudio Pereira**
+
+---
