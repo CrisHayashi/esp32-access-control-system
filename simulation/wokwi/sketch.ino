@@ -2,12 +2,12 @@
 #include <ESP32Servo.h>
 #include <Wire.h>
 #include <LiquidCrystal_I2C.h>
+#include <string.h>
 
 /* LCD */
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
-/* ESTADOS */
-
+/* ESTADOS DO SISTEMA */
 typedef enum {
   ESTADO_AGUARDANDO,
   ESTADO_VALIDANDO,
@@ -18,318 +18,288 @@ typedef enum {
 EstadoSistema estadoAtual = ESTADO_AGUARDANDO;
 
 /* PINOS */
-
 #define LED_R 25
 #define LED_G 26
 #define LED_B 27
 
-#define BUZZER 32
-#define SERVO_PIN 13
+#define SERVO_PIN 23
 
 /* TECLADO */
-
 const byte ROWS = 4;
 const byte COLS = 4;
 
 char keys[ROWS][COLS] = {
-{'1','2','3','A'},
-{'4','5','6','B'},
-{'7','8','9','C'},
-{'*','0','#','D'}
+  {'1', '2', '3', 'A'},
+  {'4', '5', '6', 'B'},
+  {'7', '8', '9', 'C'},
+  {'*', '0', '#', 'D'}
 };
 
-byte rowPins[ROWS] = {19,18,5,17};
-byte colPins[COLS] = {16,4,2,15};
+byte rowPins[ROWS] = {19, 18, 5, 17};
+byte colPins[COLS] = {16, 4, 2, 15};
 
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 /* SERVO */
-
 Servo servoMotor;
 
 /* VARIÁVEIS */
-
-char senhaDigitada[5];
+char senhaDigitada[5] = "";
 int indiceSenha = 0;
 int tentativasErradas = 0;
 
 unsigned long tempoBloqueio = 0;
 unsigned long tempoAcesso = 0;
 unsigned long ultimoTeclaTempo = 0;
+unsigned long tempoMensagem = 0;
 
 #define DURACAO_BLOQUEIO 5000
-#define DURACAO_ACESSO 5000
+#define DURACAO_ACESSO 3000
 #define DEBOUNCE_TECLA 200
 #define MAX_TENTATIVAS 3
 
-/* RGB */
+/* CONTROLE DE MENSAGENS */
+bool aguardandoMensagem = false;
 
-void setColor(bool r, bool g, bool b){
+/* FUNÇÕES AUXILIARES */
 
-digitalWrite(LED_R,r);
-digitalWrite(LED_G,g);
-digitalWrite(LED_B,b);
-
+void limparSenha() {
+  memset(senhaDigitada, 0, sizeof(senhaDigitada));
+  indiceSenha = 0;
 }
 
-/* BUZZER PASSIVO */
-
-void beep(int freq, int tempo){
-
-ledcAttachPin(BUZZER,0);
-ledcWriteTone(0,freq);
-
-delay(tempo);
-
-ledcWriteTone(0,0);
-
+void mostrarTelaInicial() {
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Digite a senha");
+  lcd.setCursor(0, 1);
 }
 
-/* MOSTRAR SENHA */
-
-void atualizarSenha(){
-
-lcd.setCursor(0,1);
-
-for(int i=0;i<indiceSenha;i++)
-lcd.print("*");
-
+void setColor(bool r, bool g, bool b) {
+  digitalWrite(LED_R, r);
+  digitalWrite(LED_G, g);
+  digitalWrite(LED_B, b);
 }
 
-/* CAPTURA TECLA */
+void atualizarSenha() {
 
-void capturarTecla(){
+  lcd.setCursor(0, 1);
+  lcd.print("                "); // limpa a linha
+  lcd.setCursor(0, 1);
 
-char key = keypad.getKey();
-
-if(key != NO_KEY){
-
-if(millis() - ultimoTeclaTempo < DEBOUNCE_TECLA) return;
-
-ultimoTeclaTempo = millis();
-
-/* BEEP TECLA */
-
-beep(2000,50);
-
-/* LIMITE DIGITOS */
-
-if(indiceSenha >= 4) return;
-
-/* MOSTRA DIGITO TEMPORARIO */
-
-lcd.setCursor(indiceSenha,1);
-lcd.print(key);
-
-delay(300);
-
-senhaDigitada[indiceSenha++] = key;
-senhaDigitada[indiceSenha] = '\0';
-
-atualizarSenha();
-
-if(indiceSenha == 4){
-
-estadoAtual = ESTADO_VALIDANDO;
-
+  for (int i = 0; i < indiceSenha; i++) {
+    lcd.print("*");
+  }
 }
 
-}
+/* CAPTURAR TECLA */
+void capturarTecla() {
 
+  char key = keypad.getKey();
+
+  if (key != NO_KEY) {
+
+    if (millis() - ultimoTeclaTempo < DEBOUNCE_TECLA) {
+      return;
+    }
+
+    ultimoTeclaTempo = millis();
+
+    if (indiceSenha >= 4) {
+      return;
+    }
+
+    /* Mostra o dígito temporariamente */
+    lcd.setCursor(indiceSenha, 1);
+    lcd.print(key);
+
+    senhaDigitada[indiceSenha] = key;
+    indiceSenha++;
+
+    senhaDigitada[indiceSenha] = '\0';
+
+    atualizarSenha();
+
+    if (indiceSenha == 4) {
+      estadoAtual = ESTADO_VALIDANDO;
+    }
+  }
 }
 
 /* VALIDAR SENHA */
+int senhaValida(const char *senha) {
 
-int senhaValida(char *senha){
+  if (strcmp(senha, "1234") == 0) return 45;
+  if (strcmp(senha, "5678") == 0) return 90;
+  if (strcmp(senha, "1111") == 0) return 135;
+  if (strcmp(senha, "2222") == 0) return 180;
 
-if(strcmp(senha,"1234")==0) return 25;
-if(strcmp(senha,"5678")==0) return 50;
-if(strcmp(senha,"1111")==0) return 75;
-if(strcmp(senha,"2222")==0) return 90;
-
-return -1;
-
+  return -1;
 }
 
 /* PROCESSAR SENHA */
+void validarSenha() {
 
-void validarSenha(){
+  int angulo = senhaValida(senhaDigitada);
 
-int angulo = senhaValida(senhaDigitada);
+  if (angulo != -1) {
 
-if(angulo != -1){
+    Serial.print("Movendo servo para: ");
+    Serial.println(angulo);
 
-servoMotor.write(angulo);
+    servoMotor.write(angulo);
+    
+    tempoAcesso = millis();
+    tentativasErradas = 0;
 
-tempoAcesso = millis();
+    setColor(0, 1, 0);
 
-tentativasErradas = 0;
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Acesso liberado");
+    lcd.setCursor(0, 1);
+    lcd.print("Bem-vindo");
 
-setColor(0,1,0);
+    limparSenha();
 
-beep(2500,150);
-delay(120);
-beep(2500,150);
+    estadoAtual = ESTADO_ACESSO_LIBERADO;
 
-lcd.clear();
-lcd.setCursor(0,0);
-lcd.print("Acesso Liberado");
-lcd.setCursor(0,1);
-lcd.print("Bem-vindo");
+  } else {
 
-estadoAtual = ESTADO_ACESSO_LIBERADO;
+    tentativasErradas++;
 
+    setColor(1, 0, 0);
+
+    int restantes = MAX_TENTATIVAS - tentativasErradas;
+
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Senha incorreta");
+    lcd.setCursor(0, 1);
+    lcd.print("Restam: ");
+    lcd.print(restantes);
+
+    tempoMensagem = millis();
+    aguardandoMensagem = true;
+  }
 }
 
-else{
+/* CONTROLE ACESSO */
+void controlarAcesso() {
 
-tentativasErradas++;
+  if (millis() - tempoAcesso >= DURACAO_ACESSO) {
 
-setColor(1,0,0);
+    servoMotor.write(0);
 
-beep(1200,200);
-delay(100);
-beep(1200,200);
-delay(100);
-beep(1200,200);
+    setColor(0, 0, 1);
 
-int restantes = MAX_TENTATIVAS - tentativasErradas;
+    mostrarTelaInicial();
 
-lcd.clear();
-lcd.setCursor(0,0);
-lcd.print("Senha incorreta");
-lcd.setCursor(0,1);
-lcd.print("Restam: ");
-lcd.print(restantes);
-
-delay(1500);
-
-if(tentativasErradas >= MAX_TENTATIVAS){
-
-tempoBloqueio = millis();
-
-lcd.clear();
-lcd.setCursor(0,0);
-lcd.print("Sistema bloqueado");
-lcd.setCursor(0,1);
-lcd.print("Aguarde 5s");
-
-beep(800,600);
-
-estadoAtual = ESTADO_BLOQUEADO;
-
+    estadoAtual = ESTADO_AGUARDANDO;
+  }
 }
 
-else{
 
-estadoAtual = ESTADO_AGUARDANDO;
+/* CONTROLE BLOQUEIO */
+void controlarBloqueio() {
 
-lcd.clear();
-lcd.setCursor(0,0);
-lcd.print("Digite a senha");
-lcd.setCursor(0,1);
+  if (millis() - tempoBloqueio >= DURACAO_BLOQUEIO) {
 
-}
+    tentativasErradas = 0;
 
-}
+    limparSenha();
 
-indiceSenha = 0;
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Sistema ativo");
+    lcd.setCursor(0, 1);
+    lcd.print("Digite a senha");
 
-}
+    setColor(0, 0, 1);
 
-/* CONTROLA ACESSO */
-
-void controlarAcesso(){
-
-if(millis() - tempoAcesso >= DURACAO_ACESSO){
-
-servoMotor.write(0);
-
-setColor(0,0,1);
-
-lcd.clear();
-lcd.setCursor(0,0);
-lcd.print("Digite a senha");
-lcd.setCursor(0,1);
-
-estadoAtual = ESTADO_AGUARDANDO;
-
-}
-
-}
-
-/* CONTROLA BLOQUEIO */
-
-void controlarBloqueio(){
-
-if(millis() - tempoBloqueio >= DURACAO_BLOQUEIO){
-
-tentativasErradas = 0;
-
-lcd.clear();
-lcd.setCursor(0,0);
-lcd.print("Sistema ativo");
-lcd.setCursor(0,1);
-lcd.print("Digite senha");
-
-setColor(0,0,1);
-
-estadoAtual = ESTADO_AGUARDANDO;
-
-}
-
+    estadoAtual = ESTADO_AGUARDANDO;
+  }
 }
 
 /* SETUP */
+void setup() {
 
-void setup(){
+  Serial.begin(115200);
 
-Serial.begin(115200);
+  pinMode(LED_R, OUTPUT);
+  pinMode(LED_G, OUTPUT);
+  pinMode(LED_B, OUTPUT);
+    
+  /* SERVO */
+  servoMotor.setPeriodHertz(50);
+  servoMotor.attach(SERVO_PIN, 500, 2400);
+  servoMotor.write(0);
 
-pinMode(LED_R,OUTPUT);
-pinMode(LED_G,OUTPUT);
-pinMode(LED_B,OUTPUT);
+  /* LCD */
+  lcd.init();
+  lcd.backlight();
 
-pinMode(BUZZER,OUTPUT);
+  /* ESTADO INICIAL */
+  setColor(0, 0, 1);
+  
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Controle Acesso");
+  lcd.setCursor(0, 1);
+  lcd.print("Digite a senha");
 
-servoMotor.attach(SERVO_PIN);
-
-lcd.init();
-lcd.backlight();
-
-setColor(0,0,1);
-
-lcd.setCursor(0,0);
-lcd.print("Controle Acesso");
-lcd.setCursor(0,1);
-lcd.print("Digite a senha");
-
-servoMotor.write(0);
-
+  mostrarTelaInicial();
 }
 
 /* LOOP */
+void loop() {
 
-void loop(){
+  if(aguardandoMensagem){
 
-switch(estadoAtual){
+    if(millis()-tempoMensagem>1500){
 
-case ESTADO_AGUARDANDO:
-capturarTecla();
-break;
+      limparSenha();
 
-case ESTADO_VALIDANDO:
-validarSenha();
-break;
+      if(tentativasErradas>=MAX_TENTATIVAS){
 
-case ESTADO_ACESSO_LIBERADO:
-controlarAcesso();
-break;
+        tempoBloqueio = millis();
 
-case ESTADO_BLOQUEADO:
-controlarBloqueio();
-break;
+        lcd.clear();
+        lcd.setCursor(0,0);
+        lcd.print("Sistema bloqueado");
+        lcd.setCursor(0,1);
+        lcd.print("Aguarde 5s");
 
-}
+        estadoAtual = ESTADO_BLOQUEADO;
 
+      }else{
+
+        mostrarTelaInicial();
+        estadoAtual = ESTADO_AGUARDANDO;
+      }
+
+      aguardandoMensagem = false;
+    }
+
+    return;
+  }
+
+  switch (estadoAtual) {
+
+    case ESTADO_AGUARDANDO:
+      capturarTecla();
+      break;
+
+    case ESTADO_VALIDANDO:
+      validarSenha();
+      break;
+
+    case ESTADO_ACESSO_LIBERADO:
+      controlarAcesso();
+      break;
+
+    case ESTADO_BLOQUEADO:
+      controlarBloqueio();
+      break;
+  }
 }

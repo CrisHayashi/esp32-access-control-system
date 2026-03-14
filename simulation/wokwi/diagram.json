@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "author": "cristiane lima",
+  "author": "iTech",
   "editor": "wokwi",
   "parts": [
     { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": 144, "left": -33.56, "attrs": {} },
@@ -8,36 +8,23 @@
       "type": "wokwi-membrane-keypad",
       "id": "keypad1",
       "top": -107.6,
-      "left": 418.4,
+      "left": 399.2,
       "attrs": {}
     },
-    { "type": "wokwi-servo", "id": "servo1", "top": 180.4, "left": 643.2, "attrs": {} },
-    {
-      "type": "wokwi-lcd1602",
-      "id": "lcd1",
-      "top": -22.4,
-      "left": 82.4,
-      "attrs": { "pins": "i2c" }
-    },
+    { "type": "wokwi-servo", "id": "servo1", "top": 180.4, "left": 576, "attrs": {} },
+    { "type": "wokwi-lcd1602", "id": "lcd1", "top": -22, "left": 82, "attrs": { "pins": "i2c" } },
     {
       "type": "wokwi-rgb-led",
       "id": "rgb1",
-      "top": -53.6,
-      "left": 356.3,
+      "top": -53,
+      "left": 356,
       "attrs": { "common": "cathode" }
-    },
-    {
-      "type": "wokwi-buzzer",
-      "id": "bz1",
-      "top": 117.6,
-      "left": 261,
-      "attrs": { "volume": "0.1" }
     },
     {
       "type": "wokwi-resistor",
       "id": "r1",
-      "top": 177.6,
-      "left": 364.25,
+      "top": 177,
+      "left": 364,
       "rotate": 90,
       "attrs": { "value": "220" }
     },
@@ -45,7 +32,7 @@
       "type": "wokwi-resistor",
       "id": "r2",
       "top": 168,
-      "left": 335.45,
+      "left": 335,
       "rotate": 90,
       "attrs": { "value": "220" }
     },
@@ -53,7 +40,7 @@
       "type": "wokwi-resistor",
       "id": "r3",
       "top": 168,
-      "left": 383.45,
+      "left": 383,
       "rotate": 90,
       "attrs": { "value": "220" }
     }
@@ -71,14 +58,12 @@
     [ "keypad1:C4", "esp:15", "green", [ "v0" ] ],
     [ "servo1:GND", "esp:GND.1", "black", [ "h0" ] ],
     [ "servo1:V+", "esp:5V", "green", [ "h0" ] ],
-    [ "servo1:PWM", "esp:13", "green", [ "h0" ] ],
+    [ "servo1:PWM", "esp:23", "green", [ "h0" ] ],
     [ "lcd1:GND", "esp:GND.2", "black", [ "h0" ] ],
     [ "lcd1:VCC", "esp:5V", "red", [ "h0" ] ],
     [ "lcd1:SDA", "esp:21", "green", [ "h-230.4", "v-9.4" ] ],
     [ "lcd1:SCL", "esp:22", "green", [ "h0" ] ],
     [ "rgb1:COM", "esp:GND.3", "green", [ "v0" ] ],
-    [ "bz1:1", "esp:GND.3", "green", [ "v0" ] ],
-    [ "bz1:2", "esp:32", "green", [ "v0" ] ],
     [ "rgb1:R", "r2:1", "green", [ "v0" ] ],
     [ "r2:2", "esp:25", "green", [ "v0" ] ],
     [ "rgb1:G", "r1:1", "green", [ "v0" ] ],
