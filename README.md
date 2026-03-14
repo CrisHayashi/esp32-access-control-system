@@ -59,7 +59,7 @@ B --> C[ESP32]
 C --> D[LCD 16x2]
 C --> E[LED RGB]
 C --> F[Servo Motor]
-
+```
 
 O ESP32 atua como unidade central de controle, responsável por:
 
@@ -86,6 +86,7 @@ D --> E{3 tentativas consecutivas?}
 
 E -->|Sim| F[Sistema bloqueado temporariamente]
 E -->|Não| A
+```
 
 ---
 
@@ -125,7 +126,6 @@ Imagem e demonstração da simulação no **Wokwi**:
 
 ## 📂 Estrutura do Projeto
 
-````markdown
 ```text
 Controle-Acesso-ESP32
 │
@@ -148,6 +148,7 @@ Controle-Acesso-ESP32
 │
 ├── README.md
 └── .gitignore
+```
 
 ---
 
