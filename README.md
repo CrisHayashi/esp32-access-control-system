@@ -5,10 +5,14 @@
 ![IoT](https://img.shields.io/badge/Architecture-IoT-purple)
 ![Simulator](https://img.shields.io/badge/Simulation-Wokwi-yellow)
 ![License](https://img.shields.io/badge/License-Academic-lightgrey)
+![Status](https://img.shields.io/badge/status-prototype-blue)
+![Platform](https://img.shields.io/badge/platform-ESP32-green)
 
-Projeto acadêmico desenvolvido no curso de **Análise e Desenvolvimento de Sistemas**, na disciplina de **Sistemas Embarcados**.
+## 🚀 Sobre o Projeto
 
-O sistema implementa um **controle de acesso embarcado baseado em senha**, utilizando ESP32 e diversos periféricos de interface para interação com o usuário.
+Este projeto implementa um **Sistema de Controle de Acesso baseado em ESP32**, capaz de autenticar usuários através de senha digitada em teclado matricial e controlar um mecanismo de abertura utilizando servo motor.
+
+O sistema fornece feedback visual através de **display LCD e LED RGB**, além de possuir arquitetura preparada para futura integração com **Internet das Coisas (IoT)** para monitoramento remoto de eventos de acesso.
 
 ---
 
@@ -21,6 +25,7 @@ O sistema implementa um **controle de acesso embarcado baseado em senha**, utili
 ## 📑 Sumário
 
 - [📌 Visão Geral](#-visão-geral)
+- [🎯 Problema Resolvido](#-problema-resolvido)
 - [🧠 Arquitetura do Sistema](#-arquitetura-do-sistema)
 - [⚙️ Funcionamento do Sistema](#️-funcionamento-do-sistema)
 - [🖥 Interface do Usuário](#-interface-do-usuário)
@@ -30,8 +35,10 @@ O sistema implementa um **controle de acesso embarcado baseado em senha**, utili
 - [🛠 Tecnologias Utilizadas](#-tecnologias-utilizadas)
 - [🚀 MVP1 — Sistema Embarcado Local](#-mvp1--sistema-embarcado-local)
 - [🌐 MVP2 — Integração IoT](#-mvp2--integração-iot-planejado)
-- [🧪 Simulação](#-simulação)
-- [👨‍💻 Autor](#-autor)
+- [🧪 Simulação no Wokwi](#-simulação-no-wokwi)
+- [🏢 Empresa](#-empresa)
+- [👥 Equipe](#-equipe)
+- [🎓 Contexto Acadêmico](#-contexto-academico)
 
 ---
 
@@ -45,6 +52,16 @@ O sistema fornece feedback ao usuário por meio de:
 - 📟 Display LCD 16x2 (I2C)
 - 💡 LED RGB para indicação de status
 - ⚙️ Servo motor para simulação da abertura do acesso
+
+---
+
+## 🎯 Problema Resolvido
+
+Sistemas simples de controle de acesso são frequentemente necessários em ambientes como laboratórios, escritórios e áreas restritas.
+
+Este projeto demonstra como um **microcontrolador ESP32 pode ser utilizado para implementar um sistema de autenticação por senha de baixo custo**, capaz de controlar o acesso físico a um ambiente e fornecer feedback imediato ao usuário.
+
+A solução pode ser aplicada em cenários de automação e segurança onde é necessário restringir o acesso a determinados locais.
 
 ---
 
@@ -116,11 +133,9 @@ Hardware utilizado no projeto:
 
 ## 🎬 Simulação do Circuito
 
-Imagem e demonstração da simulação no **Wokwi**:
+Imagem da simulação no **Wokwi**:
 
 ![Circuito](hardware/circuito.png)
-
-![Demonstração](hardware/demo.gif)
 
 ---
 
@@ -198,7 +213,7 @@ Eventos que poderão ser monitorados:
 
 ---
 
-## 🧪 Simulação
+## 🧪 Simulação no Wokwi
 
 O circuito pode ser executado utilizando o simulador **Wokwi**, através dos arquivos presentes na pasta:
 
@@ -208,12 +223,32 @@ simulation/wokwi
 
 ---
 
-## 👨‍💻 Autor
+## 🏢 Empresa
+iTech - Inspirational Tech
 
-Projeto desenvolvido por **iTech, inspirational Tech**  
+A iTech – Inspirational Tech é uma equipe formada por estudantes do curso de Análise e Desenvolvimento de Sistemas, que se dedicou no período de 2026.1, ao desenvolvimento de soluções tecnológicas baseadas em sistemas embarcados, automação e Internet das Coisas (IoT).
 
-🎓 Curso: **Análise e Desenvolvimento de Sistemas**  
-🏫 Universidade: **Faculdade Nova Roma**  
+O objetivo da equipe é projetar sistemas que integrem hardware e software, utilizando microcontroladores e dispositivos eletrônicos para resolver problemas práticos relacionados a segurança, automação e monitoramento de ambientes.
+
+O projeto apresentado neste repositório representa uma solução de controle de acesso embarcado.
+
+---
+
+## 👥 Equipe
+
+| Integrante | Responsabilidades |
+|------------|--------|
+| Cristiane Hayashi | Arquitetura do sistema, desenvolvimento do firmware e documentação técnica |
+| Pedro Paulo | Implementação de funcionalidades e execução de testes |
+| Ramon Baier Alves | Integração do projeto e suporte na validação do sistema |
+
+---
+
+# 🎓 Contexto Acadêmico
+
+Este projeto foi desenvolvido no contexto acadêmico do curso de Análise e Desenvolvimento de Sistemas, com foco na aplicação prática dos conceitos de programação embarcada, integração de hardware e software e arquitetura de sistemas IoT.
+ 
+🏫 Instituição: **Faculdade Nova Roma**  
 📚 Disciplina: **Sistemas Embarcados**  
 👨‍🏫 Professor: **Claudio Pereira**
 
