@@ -1,21 +1,21 @@
-#include <Keypad.h>
-#include <ESP32Servo.h>
-#include <Wire.h>
-#include <LiquidCrystal_I2C.h>
-#include <string.h>
+#include <Keypad.h>               // Biblioteca para leitura de teclado matricial
+#include <ESP32Servo.h>           // Biblioteca específica para controle de servo no ESP32 (usa PWM via LEDC)
+#include <Wire.h>                 // Biblioteca para comunicação I2C (usada pelo LCD)
+#include <LiquidCrystal_I2C.h>    // Biblioteca para controle de LCD via I2C
+#include <string.h>               // Biblioteca padrão C para manipulação de strings (strcmp, memset)
 
 /* LCD */
 LiquidCrystal_I2C lcd(0x27, 16, 2);
 
 /* ESTADOS DO SISTEMA*/
-typedef enum {
+typedef enum {                    // Definição de um tipo enumerado para máquina de estados
   ESTADO_AGUARDANDO,
   ESTADO_VALIDANDO,
   ESTADO_ACESSO_LIBERADO,
   ESTADO_BLOQUEADO
 } EstadoSistema;
 
-EstadoSistema estadoAtual = ESTADO_AGUARDANDO;
+EstadoSistema estadoAtual = ESTADO_AGUARDANDO;  // Inicializa sistema no estado "aguardando"
 
 /* PINOS */
 #define LED_R 25
@@ -28,7 +28,7 @@ EstadoSistema estadoAtual = ESTADO_AGUARDANDO;
 const byte ROWS = 4;
 const byte COLS = 4;
 
-char keys[ROWS][COLS] = {
+char keys[ROWS][COLS] = {         // Mapeamento das teclas do teclado matricial
 {'1','2','3','A'},
 {'4','5','6','B'},
 {'7','8','9','C'},
@@ -38,6 +38,7 @@ char keys[ROWS][COLS] = {
 byte rowPins[ROWS] = {19,18,5,17};
 byte colPins[COLS] = {16,4,2,15};
 
+// Inicializa o teclado com o mapa de teclas e pinos
 Keypad keypad = Keypad(makeKeymap(keys), rowPins, colPins, ROWS, COLS);
 
 /* SERVO */
@@ -84,11 +85,11 @@ void setColor(bool r, bool g, bool b) {
 void atualizarSenha() {
 
   lcd.setCursor(0, 1);
-  lcd.print("                "); // limpa a linha
+  lcd.print("                ");        // limpa a linha
   lcd.setCursor(0, 1);
 
-  for (int i = 0; i < indiceSenha; i++) {
-    lcd.print("*");
+  for (int i = 0; i < indiceSenha; i++) {     
+    lcd.print("*");                     // Mostra senha mascarada com '*'
   }
 }
 
@@ -224,16 +225,16 @@ void controlarBloqueio() {
 /* SETUP */
 void setup() {
 
-  Serial.begin(115200);
+  Serial.begin(115200);                     // Inicializa comunicação serial
 
   pinMode(LED_R, OUTPUT);
   pinMode(LED_G, OUTPUT);
   pinMode(LED_B, OUTPUT);
     
   /* SERVO */
-  servoMotor.setPeriodHertz(50);
-  servoMotor.attach(SERVO_PIN, 500, 2400);
-  servoMotor.write(0);
+  servoMotor.setPeriodHertz(50);            // Define frequência PWM (50Hz padrão servo)
+  servoMotor.attach(SERVO_PIN, 500, 2400);  // Associa servo ao pino com limites de pulso
+  servoMotor.write(0);                      // Posição inicial
 
   /* LCD */
   lcd.init();
@@ -281,7 +282,7 @@ void loop() {
       aguardandoMensagem = false;
     }
 
-    return;
+    return;                                 // Evita executar resto do loop
   }
 
   switch (estadoAtual) {
