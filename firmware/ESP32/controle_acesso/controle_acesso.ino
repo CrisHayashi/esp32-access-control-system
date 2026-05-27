@@ -3,6 +3,8 @@
 #include <Wire.h>                 // Biblioteca para comunicação I2C (usada pelo LCD)
 #include <LiquidCrystal_I2C.h>    // Biblioteca para controle de LCD via I2C
 #include <string.h>               // Biblioteca padrão C para manipulação de strings (strcmp, memset)
+#include <WiFi.h>
+#include <HTTPClient.h>
 
 /* LCD */
 LiquidCrystal_I2C lcd(0x27, 16, 2);
@@ -58,6 +60,13 @@ unsigned long tempoMensagem = 0;
 #define DURACAO_ACESSO 3000
 #define DEBOUNCE_TECLA 200
 #define MAX_TENTATIVAS 3
+
+/* WIFI */
+const char* WIFI_SSID = "Wokwi-GUEST";
+const char* WIFI_PASSWORD = "";
+
+/* TAGO IO */
+const char* TAGO_TOKEN = "07a74157-3114-4cb1-aa0a-8b69ff5b5601";
 
 /* CONTROLE DE MENSAGENS */
 bool aguardandoMensagem = false;
@@ -136,6 +145,57 @@ int senhaValida(const char *senha) {
   if (strcmp(senha, "2222") == 0) return 180;
 
   return -1;
+}
+
+/* TAGOIO */
+void enviarEventoTagoIO(String status, String local, int angulo, int tentativasErradas, String codigoDigitado) {
+
+  if (WiFi.status() == WL_CONNECTED) {
+
+    HTTPClient http;
+
+    http.begin("https://api.tago.io/data");
+    
+    http.addHeader("Content-Type", "application/json");
+    http.addHeader("Device-Token", TAGO_TOKEN);
+
+    String json = "[";
+
+    json += "{\"variable\":\"status\",\"value\":\"" + status + "\"},";
+
+    json += "{\"variable\":\"local\",\"value\":\"" + local + "\"},";
+
+    json += "{\"variable\":\"angulo\",\"value\":" + String(angulo) + "},";
+
+    json += "{\"variable\":\"tentativasErradas\",\"value\":" + String(tentativasErradas) + "},";
+
+    json += "{\"variable\":\"codigo_digitado\",\"value\":\"" + codigoDigitado + "\"}";
+
+    json += "]";
+
+    Serial.println("Payload enviado:");
+    Serial.println(json);
+
+    int httpResponseCode = http.POST(json);
+
+    Serial.print("HTTP Response code: ");
+    Serial.println(httpResponseCode);
+
+    Serial.println(http.getString());
+
+    http.end();
+
+  } else {
+    Serial.println("WiFi desconectado. Evento nao enviado.");
+  }
+}
+
+String localAcesso(int angulo) {
+  if (angulo == 45) return "Local 1";
+  if (angulo == 90) return "Local 2";
+  if (angulo == 135) return "Local 3";
+  if (angulo == 180) return "Local 4";
+  return "N/A";
 }
 
 /* PROCESSAR SENHA */
@@ -226,6 +286,19 @@ void controlarBloqueio() {
 void setup() {
 
   Serial.begin(115200);                     // Inicializa comunicação serial
+
+    /* WIFI */
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
+  Serial.print("Conectando WiFi");
+
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("");
+  Serial.println("WiFi conectado!");
 
   pinMode(LED_R, OUTPUT);
   pinMode(LED_G, OUTPUT);
