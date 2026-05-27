@@ -129,7 +129,7 @@ Os eventos são enviados pelo ESP32 em formato JSON contendo:
   {"variable":"tentativasErradas","value":0},
   {"variable":"codigo_digitado","value":"1234"}
 ]
-
+```
 ---
 
 ## 📊 Dashboard TagoIO
