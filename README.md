@@ -226,10 +226,27 @@ A[Usuário digita senha] --> B[ESP32 valida senha]
 B -->|Senha correta| C[Acesso liberado]
 B -->|Senha incorreta| D[Tentativa rejeitada]
 
+C --> G[Servo Motor acionado]
+G --> H[LED Verde + LCD]
+H --> I[Evento enviado para TagoIO]
+
+D --> J[LED Vermelho + LCD]
+J --> K[Registro de tentativa inválida]
+K --> L[Evento enviado para TagoIO]
+
 D --> E{3 tentativas consecutivas?}
 
 E -->|Sim| F[Sistema bloqueado temporariamente]
+F --> M[LED Amarelo]
+M --> N[Envio de alerta para TagoIO]
+
 E -->|Não| A
+
+I --> O[Dashboard atualizado]
+L --> O
+N --> O
+
+O --> P[Aplicativo Mobile atualizado]
 ```
 
 ---
